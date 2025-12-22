@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Sulejówek – Rozkłady</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f2f2f2;
+}
+
+/* GÓRNE MENU */
+.header {
+  background: #111;
+  color: white;
+  padding: 14px;
+  text-align: center;
+  font-size: 18px;
+}
+
+/* MENU ZAKŁADEK */
+.tabs {
+  display: flex;
+  background: #222;
+}
+.tab {
+  flex: 1;
+  padding: 12px;
+  text-align: center;
+  color: white;
+  cursor: pointer;
+}
+.tab.active {
+  background: #444;
+}
+
+/* ZAWARTOŚĆ */
+.content {
+  padding: 15px;
+}
+
+/* LISTA LINII */
+.line {
+  background: white;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* ROZKŁAD */
+.schedule {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+}
+.back {
+  margin-bottom: 10px;
+  color: #007bff;
+  cursor: pointer;
+}
+.time {
+  display: inline-block;
+  width: 60px;
+  padding: 6px;
+  margin: 4px;
+  text-align: center;
+  background: #eee;
+  border-radius: 6px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">Sulejówek – Komunikacja</div>
+
+<div class="tabs">
+  <div class="tab active">Rozkłady</div>
+</div>
+
+<div class="content" id="content"></div>
+
+<script>
+// ===== DANE =====
+const data = {
+  "Linia Północna": {
+    stops: "-> PKP Sulejówek Miłosna",
+    times: ["05:38", "06:07", "06:38", "07:04", "07:28", "08:10", "08:34", "09:10"
+           , "10:08", "11:25", "12:28", "13:39", "14:30", "15:24", "16:25", "16:56"
+             , "17:25", "17:56", "18:25", "18:56", "19:56", "20:56"],
+  },
+  "Linia Południowa": {
+    stops: " -> Sulejówek Dzielna",
+    times: ["05:20", "06:05", "06:50", "07:32", "08:25", "09:20", "10:20", "11:20", "12:10"
+           , "12:55", "14:00", "15:00", "15:45", "16:25", "17:08", "17:50", "18:38", "19:20"
+                , "20:08", "21:08"],
+  }
+};
+
+// ===== WIDOK LISTY LINII =====
+function showLines() {
+  const c = document.getElementById("content");
+  c.innerHTML = "";
+
+  Object.keys(data).forEach(line => {
+    const div = document.createElement("div");
+    div.className = "line";
+    div.innerHTML = `<b>${line}</b><br><small>${data[line].stops}</small>`;
+    div.onclick = () => showSchedule(line);
+    c.appendChild(div);
+  });
+}
+
+// ===== WIDOK ROZKŁADU =====
+function showSchedule(line) {
+  const c = document.getElementById("content");
+  c.innerHTML = `
+    <div class="schedule">
+      <div class="back" onclick="showLines()">← Wróć</div>
+      <h3>${line}</h3>
+      <p>${data[line].stops}</p>
+      ${data[line].times.map(t => `<span class="time">${t}</span>`).join("")}
+    </div>
+  `;
+}
+
+// START
+showLines();
+</script>
+
+</body>
+</html>
