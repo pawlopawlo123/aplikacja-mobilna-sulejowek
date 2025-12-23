@@ -1,138 +1,130 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
-<title>Sulejówek – Rozkłady</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rozkład Północna</title>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- PWA -->
+  <meta name="theme-color" content="#020617">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="Rozkład Północna">
 
-<style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f2f2f2;
-}
+  <link rel="manifest" href="data:application/json,{
+    &quot;name&quot;:&quot;Rozkład Północna&quot;,
+    &quot;short_name&quot;:&quot;Północna&quot;,
+    &quot;start_url&quot;:&quot;.&quot;,
+    &quot;display&quot;:&quot;standalone&quot;,
+    &quot;background_color&quot;:&quot;#020617&quot;,
+    &quot;theme_color&quot;:&quot;#020617&quot;
+  }">
 
-/* GÓRNE MENU */
-.header {
-  background: #111;
-  color: white;
-  padding: 14px;
-  text-align: center;
-  font-size: 18px;
-}
-
-/* MENU ZAKŁADEK */
-.tabs {
-  display: flex;
-  background: #222;
-}
-.tab {
-  flex: 1;
-  padding: 12px;
-  text-align: center;
-  color: white;
-  cursor: pointer;
-}
-.tab.active {
-  background: #444;
-}
-
-/* ZAWARTOŚĆ */
-.content {
-  padding: 15px;
-}
-
-/* LISTA LINII */
-.line {
-  background: white;
-  padding: 15px;
-  margin-bottom: 10px;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-/* ROZKŁAD */
-.schedule {
-  background: white;
-  padding: 15px;
-  border-radius: 8px;
-}
-.back {
-  margin-bottom: 10px;
-  color: #007bff;
-  cursor: pointer;
-}
-.time {
-  display: inline-block;
-  width: 60px;
-  padding: 6px;
-  margin: 4px;
-  text-align: center;
-  background: #eee;
-  border-radius: 6px;
-}
-</style>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, Roboto, Arial, sans-serif;
+      background: #0b1220;
+      color: #e5e7eb;
+    }
+    .header {
+      padding: 16px;
+      background: #020617;
+      border-bottom: 1px solid #1e293b;
+    }
+    .line {
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .direction {
+      font-size: 14px;
+      color: #94a3b8;
+    }
+    .list {
+      height: calc(100vh - 72px);
+      overflow-y: auto;
+    }
+    .stop {
+      display: flex;
+      padding: 14px 16px;
+    }
+    .time {
+      width: 52px;
+      font-weight: 600;
+      color: #38bdf8;
+    }
+    .timeline {
+      width: 24px;
+      position: relative;
+    }
+    .line-vertical {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 11px;
+      width: 2px;
+      background: #1e40af;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      background: #38bdf8;
+      border-radius: 50%;
+      position: absolute;
+      top: 22px;
+      left: 7px;
+    }
+    .stop:first-child .line-vertical { top: 22px; }
+    .stop:last-child .line-vertical { bottom: calc(100% - 22px); }
+    .info {
+      flex: 1;
+      border-bottom: 1px solid #1e293b;
+      padding-bottom: 12px;
+    }
+    .name {
+      font-size: 16px;
+    }
+    .delay {
+      font-size: 12px;
+      color: #22c55e;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+  </style>
 </head>
 
 <body>
+  <div class="header">
+    <div class="line">Północna</div>
+    <div class="direction">Kierunek: PKP Sulejówek Miłosna</div>
+  </div>
 
-<div class="header">Sulejówek – Komunikacja</div>
+  <div class="list">
 
-<div class="tabs">
-  <div class="tab active">Rozkłady</div>
-</div>
+    <div class="stop"><div class="time">05:38</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">PKP Sulejówek Miłosna (01)</div><div class="delay">Planowo</div></div></div>
+    <div class="stop"><div class="time">05:39</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Krótka (01)</div><div class="delay">Planowo</div></div></div>
+    <div class="stop"><div class="time">05:40</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Wyspiańskiego (02)</div><div class="delay">Planowo</div></div></div>
+    <div class="stop"><div class="time">05:41</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Szekspira (02)</div><div class="delay">Planowo</div></div></div>
+    <div class="stop"><div class="time">05:42</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Dąbrowskiego (02)</div><div class="delay">Planowo</div></div></div>
+    <div class="stop"><div class="time">05:43</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Tramwajowa (02)</div><div class="delay">Planowo</div></div></div>
+    <div class="stop"><div class="time">05:44</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Długa (01)</div><div class="delay">Planowo</div></div></div>
+    <div class="stop"><div class="time">05:45</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Łomżyńska (01)</div><div class="delay">Planowo</div></div></div>
+    <div class="stop"><div class="time">05:46</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Partyzantów (01)</div><div class="delay">Planowo</div></div></div>
+    <div class="stop"><div class="time">05:47</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Łukasińskiego (01)</div><div class="delay">Planowo</div></div></div>
+    <div class="stop"><div class="time">05:48</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Dąbrowskiego (01)</div><div class="delay">Planowo</div></div></div>
+    <div class="stop"><div class="time">05:49</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Szekspira (01)</div><div class="delay">Planowo</div></div></div>
+    <div class="stop"><div class="time">05:50</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Wyspiańskiego (01)</div><div class="delay">Planowo</div></div></div>
+    <div class="stop"><div class="time">05:51</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Głowackiego (02)</div><div class="delay">Planowo</div></div></div>
+    <div class="stop"><div class="time">05:52</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">PKP Sulejówek Miłosna (02)</div><div class="delay">Planowo</div></div></div>
+    <div class="stop"><div class="time">05:53</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Sulejówek Miłosna-Pomnik (01)</div><div class="delay">Planowo</div></div></div>
+    <div class="stop"><div class="time">05:54</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Kopernika (02)</div><div class="delay">Planowo</div></div></div>
+    <div class="stop"><div class="time">05:55</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Wilsona (04)</div><div class="delay">Planowo</div></div></div>
+    <div class="stop"><div class="time">05:56</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Polna (02)</div><div class="delay">Planowo</div></div></div>
+    <div class="stop"><div class="time">05:57</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Bydgoska (02)</div><div class="delay">Planowo</div></div></div>
+    <div class="stop"><div class="time">05:58</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Warecka (01)</div><div class="delay">Planowo</div></div></div>
+    <div class="stop"><div class="time">05:59</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Cicha (01)</div><div class="delay">Planowo</div></div></div>
+    <div class="stop"><div class="time">06:00</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Zelwerowicza (01)</div><div class="delay">Planowo</div></div></div>
+    <div class="stop"><div class="time">06:01</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">PKP Sulejówek Miłosna (01)</div><div class="delay">Planowo</div></div></div>
 
-<div class="content" id="content"></div>
-
-<script>
-// ===== DANE =====
-const data = {
-  "Linia Północna": {
-    stops: "-> PKP Sulejówek Miłosna",
-    times: ["05:38", "06:07", "06:38", "07:04", "07:28", "08:10", "08:34", "09:10"
-           , "10:08", "11:25", "12:28", "13:39", "14:30", "15:24", "16:25", "16:56"
-             , "17:25", "17:56", "18:25", "18:56", "19:56", "20:56"],
-  },
-  "Linia Południowa": {
-    stops: " -> Sulejówek Dzielna",
-    times: ["05:20", "06:05", "06:50", "07:32", "08:25", "09:20", "10:20", "11:20", "12:10"
-           , "12:55", "14:00", "15:00", "15:45", "16:25", "17:08", "17:50", "18:38", "19:20"
-                , "20:08", "21:08"],
-  }
-};
-
-// ===== WIDOK LISTY LINII =====
-function showLines() {
-  const c = document.getElementById("content");
-  c.innerHTML = "";
-
-  Object.keys(data).forEach(line => {
-    const div = document.createElement("div");
-    div.className = "line";
-    div.innerHTML = `<b>${line}</b><br><small>${data[line].stops}</small>`;
-    div.onclick = () => showSchedule(line);
-    c.appendChild(div);
-  });
-}
-
-// ===== WIDOK ROZKŁADU =====
-function showSchedule(line) {
-  const c = document.getElementById("content");
-  c.innerHTML = `
-    <div class="schedule">
-      <div class="back" onclick="showLines()">← Wróć</div>
-      <h3>${line}</h3>
-      <p>${data[line].stops}</p>
-      ${data[line].times.map(t => `<span class="time">${t}</span>`).join("")}
-    </div>
-  `;
-}
-
-// START
-showLines();
-</script>
-
+  </div>
 </body>
-</html>
+                                                                                                                                                           </html>
