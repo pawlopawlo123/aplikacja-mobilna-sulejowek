@@ -1,130 +1,47 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rozkład Północna</title>
+    <head>
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+        />
+        <meta property="og:title" content="🚈 zbiorkom.live" />
+        <meta property="og:image" content="/logo512.png" />
+        <link rel="icon" href="/favicon.svg" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta
+            property="og:description"
+            content="Odkrywaj komunikację miejską w swoim mieście na nowo ✨ z zbiorkom.live. Śledź pojazdy na mapie, sprawdź ich trasy oraz najbliższe odjazdy z przystanków. Dostosuj wyświetlanie dzięki filtrom linii i modelu pojazdu."
+        />
+        <meta
+            name="description"
+            content="Śledź w czasie rzeczywistym ruch autobusów, tramwajów i pociągów. Klikając na pojazd lub przystanek, uzyskaj szczegółowe informacje o trasie oraz najbliższych odjazdach. Dostosuj widok mapy, filtrując według interesujących Cię linii lub modelu pojazdu, by szybko i sprawnie planować swoją podróż."
+        />
+        <meta name="theme-color" content="#276b2b" />
+        <meta content="dark light" name="color-scheme" />
+        <title>zbiorkom.live</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+            rel="stylesheet"
+        />
+    </head>
 
-  <!-- PWA -->
-  <meta name="theme-color" content="#020617">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="application-name" content="Rozkład Północna">
+    <body>
+        <noscript><div data-nosnippet="true">Włącz JavaScript, aby uruchomić tą aplikację.</div></noscript>
+        <div id="root"></div>
+        <script type="module" src="/src/index.tsx"></script>
 
-  <link rel="manifest" href="data:application/json,{
-    &quot;name&quot;:&quot;Rozkład Północna&quot;,
-    &quot;short_name&quot;:&quot;Północna&quot;,
-    &quot;start_url&quot;:&quot;.&quot;,
-    &quot;display&quot;:&quot;standalone&quot;,
-    &quot;background_color&quot;:&quot;#020617&quot;,
-    &quot;theme_color&quot;:&quot;#020617&quot;
-  }">
+        <script>
+            document
+                .querySelector("meta[name=theme-color]")
+                .setAttribute("content", localStorage.getItem("themeColor") || "#276b2b");
 
-  <style>
-    body {
-      margin: 0;
-      font-family: system-ui, Roboto, Arial, sans-serif;
-      background: #0b1220;
-      color: #e5e7eb;
-    }
-    .header {
-      padding: 16px;
-      background: #020617;
-      border-bottom: 1px solid #1e293b;
-    }
-    .line {
-      font-size: 22px;
-      font-weight: 700;
-    }
-    .direction {
-      font-size: 14px;
-      color: #94a3b8;
-    }
-    .list {
-      height: calc(100vh - 72px);
-      overflow-y: auto;
-    }
-    .stop {
-      display: flex;
-      padding: 14px 16px;
-    }
-    .time {
-      width: 52px;
-      font-weight: 600;
-      color: #38bdf8;
-    }
-    .timeline {
-      width: 24px;
-      position: relative;
-    }
-    .line-vertical {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 11px;
-      width: 2px;
-      background: #1e40af;
-    }
-    .dot {
-      width: 10px;
-      height: 10px;
-      background: #38bdf8;
-      border-radius: 50%;
-      position: absolute;
-      top: 22px;
-      left: 7px;
-    }
-    .stop:first-child .line-vertical { top: 22px; }
-    .stop:last-child .line-vertical { bottom: calc(100% - 22px); }
-    .info {
-      flex: 1;
-      border-bottom: 1px solid #1e293b;
-      padding-bottom: 12px;
-    }
-    .name {
-      font-size: 16px;
-    }
-    .delay {
-      font-size: 12px;
-      color: #22c55e;
-      font-weight: 600;
-      margin-top: 4px;
-    }
-  </style>
-</head>
-
-<body>
-  <div class="header">
-    <div class="line">Północna</div>
-    <div class="direction">Kierunek: PKP Sulejówek Miłosna</div>
-  </div>
-
-  <div class="list">
-
-    <div class="stop"><div class="time">05:38</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">PKP Sulejówek Miłosna (01)</div><div class="delay">Planowo</div></div></div>
-    <div class="stop"><div class="time">05:39</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Krótka (01)</div><div class="delay">Planowo</div></div></div>
-    <div class="stop"><div class="time">05:40</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Wyspiańskiego (02)</div><div class="delay">Planowo</div></div></div>
-    <div class="stop"><div class="time">05:41</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Szekspira (02)</div><div class="delay">Planowo</div></div></div>
-    <div class="stop"><div class="time">05:42</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Dąbrowskiego (02)</div><div class="delay">Planowo</div></div></div>
-    <div class="stop"><div class="time">05:43</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Tramwajowa (02)</div><div class="delay">Planowo</div></div></div>
-    <div class="stop"><div class="time">05:44</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Długa (01)</div><div class="delay">Planowo</div></div></div>
-    <div class="stop"><div class="time">05:45</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Łomżyńska (01)</div><div class="delay">Planowo</div></div></div>
-    <div class="stop"><div class="time">05:46</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Partyzantów (01)</div><div class="delay">Planowo</div></div></div>
-    <div class="stop"><div class="time">05:47</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Łukasińskiego (01)</div><div class="delay">Planowo</div></div></div>
-    <div class="stop"><div class="time">05:48</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Dąbrowskiego (01)</div><div class="delay">Planowo</div></div></div>
-    <div class="stop"><div class="time">05:49</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Szekspira (01)</div><div class="delay">Planowo</div></div></div>
-    <div class="stop"><div class="time">05:50</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Wyspiańskiego (01)</div><div class="delay">Planowo</div></div></div>
-    <div class="stop"><div class="time">05:51</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Głowackiego (02)</div><div class="delay">Planowo</div></div></div>
-    <div class="stop"><div class="time">05:52</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">PKP Sulejówek Miłosna (02)</div><div class="delay">Planowo</div></div></div>
-    <div class="stop"><div class="time">05:53</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Sulejówek Miłosna-Pomnik (01)</div><div class="delay">Planowo</div></div></div>
-    <div class="stop"><div class="time">05:54</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Kopernika (02)</div><div class="delay">Planowo</div></div></div>
-    <div class="stop"><div class="time">05:55</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Wilsona (04)</div><div class="delay">Planowo</div></div></div>
-    <div class="stop"><div class="time">05:56</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Polna (02)</div><div class="delay">Planowo</div></div></div>
-    <div class="stop"><div class="time">05:57</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Bydgoska (02)</div><div class="delay">Planowo</div></div></div>
-    <div class="stop"><div class="time">05:58</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Warecka (01)</div><div class="delay">Planowo</div></div></div>
-    <div class="stop"><div class="time">05:59</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Cicha (01)</div><div class="delay">Planowo</div></div></div>
-    <div class="stop"><div class="time">06:00</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">Zelwerowicza (01)</div><div class="delay">Planowo</div></div></div>
-    <div class="stop"><div class="time">06:01</div><div class="timeline"><div class="line-vertical"></div><div class="dot"></div></div><div class="info"><div class="name">PKP Sulejówek Miłosna (01)</div><div class="delay">Planowo</div></div></div>
-
-  </div>
-</body>
-                                                                                                                                                           </html>
+            if (localStorage.getItem("disableLiquidGlass") === "true") {
+                document.body.classList.add("disable-liquid-glass");
+            }
+        </script>
+    </body>
+</html>
