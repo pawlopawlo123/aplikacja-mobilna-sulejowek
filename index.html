@@ -35,7 +35,7 @@ body { margin:0; font-family: Arial; }
 </div>
 
 <script>
-const map = L.map('map').setView([52.2297, 21.0122], 12);
+const map = L.map('map').setView([52.2297, 21.0122], 13);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap'
@@ -52,78 +52,61 @@ fetch(GTFS_URL)
 
     Promise.all([
         gtfs.getStops(),
-        gtfs.getStopTimes(),
-        gtfs.getShapes()
-    ]).then(([stops, stopTimes, shapes]) => {
+        gtfs.getStopTimes()
+    ]).then(([stops, stopTimes]) => {
 
-        console.log("Dane wczytane");
-
-        // 🔥 Tworzymy szybki indeks: stop_id → czasy
+        // 🔥 indeks odjazdów
         const stopIndex = {};
         stopTimes.forEach(st => {
-            if (!stopIndex[st.stop_id]) {
-                stopIndex[st.stop_id] = [];
-            }
+            if (!stopIndex[st.stop_id]) stopIndex[st.stop_id] = [];
             stopIndex[st.stop_id].push(st.departure_time);
         });
 
-        // 🔹 Rysowanie przystanków
+        // 🔥 WARSTWA przystanków (lepsza wydajność)
+        const stopsLayer = L.layerGroup().addTo(map);
+
         stops.forEach(stop => {
 
             if (!stop.stop_lat || !stop.stop_lon) return;
 
             const marker = L.circleMarker(
                 [parseFloat(stop.stop_lat), parseFloat(stop.stop_lon)],
-                { radius: 4 }
-            ).addTo(map);
+                {
+                    radius: 8,              // większy obszar klikalny
+                    fillColor: "#00ff66",
+                    color: "#006633",
+                    weight: 1,
+                    fillOpacity: 0.9
+                }
+            ).addTo(stopsLayer);
 
-            marker.on("click", () => {
+            marker.bindPopup("Ładowanie...");
+
+            marker.on("click", function() {
 
                 const departures = stopIndex[stop.stop_id];
 
                 let html = `<b>${stop.stop_name}</b><br><br>`;
 
                 if (!departures || departures.length === 0) {
-                    html += "Brak danych o odjazdach.";
+                    html += "Brak odjazdów";
                 } else {
                     departures
                         .sort()
-                        .slice(0, 20)
+                        .slice(0, 15)
                         .forEach(time => {
-                            html += `Odjazd: ${time}<br>`;
+                            html += `🚌 ${time}<br>`;
                         });
                 }
 
-                document.getElementById("schedule").innerHTML = html;
+                marker.setPopupContent(html);
             });
 
         });
 
-        // 🔹 Rysowanie tras
-        const groupedShapes = {};
-        shapes.forEach(shape => {
-            if (!groupedShapes[shape.shape_id])
-                groupedShapes[shape.shape_id] = [];
-            groupedShapes[shape.shape_id].push(shape);
-        });
-
-        Object.values(groupedShapes).forEach(shapePoints => {
-            shapePoints.sort((a,b)=>a.shape_pt_sequence-b.shape_pt_sequence);
-
-            const latlngs = shapePoints.map(p => [
-                parseFloat(p.shape_pt_lat),
-                parseFloat(p.shape_pt_lon)
-            ]);
-
-            L.polyline(latlngs, {
-                weight: 2,
-                opacity: 0.4
-            }).addTo(map);
-        });
-
     });
 });
-  </script>
+              </script>
 
 </body>
 </html>
