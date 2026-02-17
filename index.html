@@ -2,37 +2,20 @@
 <html>
 <head>
 <meta charset="utf-8" />
-<title>Warszawa – Mapa Transportu</title>
+<title>Warszawa Transport</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gtfs@3.0.0/dist/gtfs.min.js"></script>
 
 <style>
-body { margin:0; font-family: Arial; }
+body { margin:0; }
 #map { height:100vh; }
-.panel {
-  position:absolute;
-  top:10px;
-  right:10px;
-  background:white;
-  padding:10px;
-  max-height:90vh;
-  overflow:auto;
-  width:300px;
-  box-shadow:0 0 10px rgba(0,0,0,0.3);
-}
 </style>
 </head>
 <body>
 
 <div id="map"></div>
-<div class="panel">
-<h3>Rozkład jazdy</h3>
-<div id="schedule">Kliknij przystanek</div>
-</div>
 
 <script>
 const map = L.map('map').setView([52.2297, 21.0122], 13);
@@ -43,70 +26,80 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 const GTFS_URL = "https://cdn.zbiorkom.live/gtfs/warsaw.zip";
 
+// 🔥 Prosty parser CSV
+function parseCSV(text) {
+    const lines = text.split("\n");
+    const headers = lines[0].split(",");
+    return lines.slice(1).map(line => {
+        const values = line.split(",");
+        let obj = {};
+        headers.forEach((h,i)=> obj[h] = values[i]);
+        return obj;
+    });
+}
+
 fetch(GTFS_URL)
-.then(res => res.arrayBuffer())
-.then(buffer => JSZip.loadAsync(buffer))
-.then(zip => {
+.then(r => r.arrayBuffer())
+.then(data => JSZip.loadAsync(data))
+.then(zip => Promise.all([
+    zip.file("stops.txt").async("string"),
+    zip.file("stop_times.txt").async("string")
+]))
+.then(([stopsText, stopTimesText]) => {
 
-    const gtfs = new GTFS(zip);
+    const stops = parseCSV(stopsText);
+    const stopTimes = parseCSV(stopTimesText);
 
-    Promise.all([
-        gtfs.getStops(),
-        gtfs.getStopTimes()
-    ]).then(([stops, stopTimes]) => {
+    // 🔥 indeks odjazdów
+    const stopIndex = {};
+    stopTimes.forEach(st => {
+        if (!stopIndex[st.stop_id]) stopIndex[st.stop_id] = [];
+        stopIndex[st.stop_id].push(st.departure_time);
+    });
 
-        // 🔥 indeks odjazdów
-        const stopIndex = {};
-        stopTimes.forEach(st => {
-            if (!stopIndex[st.stop_id]) stopIndex[st.stop_id] = [];
-            stopIndex[st.stop_id].push(st.departure_time);
-        });
+    stops.forEach(stop => {
 
-        // 🔥 WARSTWA przystanków (lepsza wydajność)
-        const stopsLayer = L.layerGroup().addTo(map);
+        if (!stop.stop_lat || !stop.stop_lon) return;
 
-        stops.forEach(stop => {
+        const marker = L.circleMarker(
+            [parseFloat(stop.stop_lat), parseFloat(stop.stop_lon)],
+            {
+                radius: 7,
+                fillColor: "#00ff66",
+                color: "#006633",
+                weight: 1,
+                fillOpacity: 0.9
+            }
+        ).addTo(map);
 
-            if (!stop.stop_lat || !stop.stop_lon) return;
+        marker.on("click", function() {
 
-            const marker = L.circleMarker(
-                [parseFloat(stop.stop_lat), parseFloat(stop.stop_lon)],
-                {
-                    radius: 8,              // większy obszar klikalny
-                    fillColor: "#00ff66",
-                    color: "#006633",
-                    weight: 1,
-                    fillOpacity: 0.9
-                }
-            ).addTo(stopsLayer);
+            const departures = stopIndex[stop.stop_id];
 
-            marker.bindPopup("Ładowanie...");
+            let html = `<b>${stop.stop_name}</b><br><br>`;
 
-            marker.on("click", function() {
+            if (!departures) {
+                html += "Brak odjazdów";
+            } else {
+                departures
+                    .sort()
+                    .slice(0, 15)
+                    .forEach(time => {
+                        html += `🚌 ${time}<br>`;
+                    });
+            }
 
-                const departures = stopIndex[stop.stop_id];
-
-                let html = `<b>${stop.stop_name}</b><br><br>`;
-
-                if (!departures || departures.length === 0) {
-                    html += "Brak odjazdów";
-                } else {
-                    departures
-                        .sort()
-                        .slice(0, 15)
-                        .forEach(time => {
-                            html += `🚌 ${time}<br>`;
-                        });
-                }
-
-                marker.setPopupContent(html);
-            });
-
+            marker.bindPopup(html).openPopup();
         });
 
     });
+
+})
+.catch(err => {
+    console.error("Błąd:", err);
+    alert("Błąd ładowania GTFS – sprawdź konsolę.");
 });
-              </script>
+</script>
 
 </body>
 </html>
