@@ -47,38 +47,59 @@ fetch(GTFS_URL)
 .then(res => res.arrayBuffer())
 .then(buffer => JSZip.loadAsync(buffer))
 .then(zip => {
+
     const gtfs = new GTFS(zip);
 
     Promise.all([
         gtfs.getStops(),
-        gtfs.getRoutes(),
-        gtfs.getTrips(),
         gtfs.getStopTimes(),
         gtfs.getShapes()
-    ]).then(([stops, routes, trips, stopTimes, shapes]) => {
+    ]).then(([stops, stopTimes, shapes]) => {
 
-        // Rysowanie przystanków
+        console.log("Dane wczytane");
+
+        // 🔥 Tworzymy szybki indeks: stop_id → czasy
+        const stopIndex = {};
+        stopTimes.forEach(st => {
+            if (!stopIndex[st.stop_id]) {
+                stopIndex[st.stop_id] = [];
+            }
+            stopIndex[st.stop_id].push(st.departure_time);
+        });
+
+        // 🔹 Rysowanie przystanków
         stops.forEach(stop => {
+
+            if (!stop.stop_lat || !stop.stop_lon) return;
+
             const marker = L.circleMarker(
                 [parseFloat(stop.stop_lat), parseFloat(stop.stop_lon)],
                 { radius: 4 }
             ).addTo(map);
 
             marker.on("click", () => {
-                const times = stopTimes
-                    .filter(t => t.stop_id === stop.stop_id)
-                    .slice(0, 20);
+
+                const departures = stopIndex[stop.stop_id];
 
                 let html = `<b>${stop.stop_name}</b><br><br>`;
-                times.forEach(t => {
-                    html += `Odjazd: ${t.departure_time}<br>`;
-                });
+
+                if (!departures || departures.length === 0) {
+                    html += "Brak danych o odjazdach.";
+                } else {
+                    departures
+                        .sort()
+                        .slice(0, 20)
+                        .forEach(time => {
+                            html += `Odjazd: ${time}<br>`;
+                        });
+                }
 
                 document.getElementById("schedule").innerHTML = html;
             });
+
         });
 
-        // Rysowanie tras
+        // 🔹 Rysowanie tras
         const groupedShapes = {};
         shapes.forEach(shape => {
             if (!groupedShapes[shape.shape_id])
@@ -96,13 +117,13 @@ fetch(GTFS_URL)
 
             L.polyline(latlngs, {
                 weight: 2,
-                opacity: 0.5
+                opacity: 0.4
             }).addTo(map);
         });
 
     });
 });
-</script>
+  </script>
 
 </body>
 </html>
