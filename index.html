@@ -1,47 +1,108 @@
-<!doctype html>
-<html lang="pl">
-    <head>
-        <meta charset="utf-8" />
-        <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-        />
-        <meta property="og:title" content="🚈 zbiorkom.live" />
-        <meta property="og:image" content="/logo512.png" />
-        <link rel="icon" href="/favicon.svg" />
-        <link rel="manifest" href="/manifest.json" />
-        <meta
-            property="og:description"
-            content="Odkrywaj komunikację miejską w swoim mieście na nowo ✨ z zbiorkom.live. Śledź pojazdy na mapie, sprawdź ich trasy oraz najbliższe odjazdy z przystanków. Dostosuj wyświetlanie dzięki filtrom linii i modelu pojazdu."
-        />
-        <meta
-            name="description"
-            content="Śledź w czasie rzeczywistym ruch autobusów, tramwajów i pociągów. Klikając na pojazd lub przystanek, uzyskaj szczegółowe informacje o trasie oraz najbliższych odjazdach. Dostosuj widok mapy, filtrując według interesujących Cię linii lub modelu pojazdu, by szybko i sprawnie planować swoją podróż."
-        />
-        <meta name="theme-color" content="#276b2b" />
-        <meta content="dark light" name="color-scheme" />
-        <title>zbiorkom.live</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link
-            href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
-            rel="stylesheet"
-        />
-    </head>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Warszawa – Mapa Transportu</title>
 
-    <body>
-        <noscript><div data-nosnippet="true">Włącz JavaScript, aby uruchomić tą aplikację.</div></noscript>
-        <div id="root"></div>
-        <script type="module" src="/src/index.tsx"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-        <script>
-            document
-                .querySelector("meta[name=theme-color]")
-                .setAttribute("content", localStorage.getItem("themeColor") || "#276b2b");
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gtfs@3.0.0/dist/gtfs.min.js"></script>
 
-            if (localStorage.getItem("disableLiquidGlass") === "true") {
-                document.body.classList.add("disable-liquid-glass");
-            }
-        </script>
-    </body>
+<style>
+body { margin:0; font-family: Arial; }
+#map { height:100vh; }
+.panel {
+  position:absolute;
+  top:10px;
+  right:10px;
+  background:white;
+  padding:10px;
+  max-height:90vh;
+  overflow:auto;
+  width:300px;
+  box-shadow:0 0 10px rgba(0,0,0,0.3);
+}
+</style>
+</head>
+<body>
+
+<div id="map"></div>
+<div class="panel">
+<h3>Rozkład jazdy</h3>
+<div id="schedule">Kliknij przystanek</div>
+</div>
+
+<script>
+const map = L.map('map').setView([52.2297, 21.0122], 12);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap'
+}).addTo(map);
+
+const GTFS_URL = "https://cdn.zbiorkom.live/gtfs/warsaw.zip";
+
+fetch(GTFS_URL)
+.then(res => res.arrayBuffer())
+.then(buffer => JSZip.loadAsync(buffer))
+.then(zip => {
+    const gtfs = new GTFS(zip);
+
+    Promise.all([
+        gtfs.getStops(),
+        gtfs.getRoutes(),
+        gtfs.getTrips(),
+        gtfs.getStopTimes(),
+        gtfs.getShapes()
+    ]).then(([stops, routes, trips, stopTimes, shapes]) => {
+
+        // Rysowanie przystanków
+        stops.forEach(stop => {
+            const marker = L.circleMarker(
+                [parseFloat(stop.stop_lat), parseFloat(stop.stop_lon)],
+                { radius: 4 }
+            ).addTo(map);
+
+            marker.on("click", () => {
+                const times = stopTimes
+                    .filter(t => t.stop_id === stop.stop_id)
+                    .slice(0, 20);
+
+                let html = `<b>${stop.stop_name}</b><br><br>`;
+                times.forEach(t => {
+                    html += `Odjazd: ${t.departure_time}<br>`;
+                });
+
+                document.getElementById("schedule").innerHTML = html;
+            });
+        });
+
+        // Rysowanie tras
+        const groupedShapes = {};
+        shapes.forEach(shape => {
+            if (!groupedShapes[shape.shape_id])
+                groupedShapes[shape.shape_id] = [];
+            groupedShapes[shape.shape_id].push(shape);
+        });
+
+        Object.values(groupedShapes).forEach(shapePoints => {
+            shapePoints.sort((a,b)=>a.shape_pt_sequence-b.shape_pt_sequence);
+
+            const latlngs = shapePoints.map(p => [
+                parseFloat(p.shape_pt_lat),
+                parseFloat(p.shape_pt_lon)
+            ]);
+
+            L.polyline(latlngs, {
+                weight: 2,
+                opacity: 0.5
+            }).addTo(map);
+        });
+
+    });
+});
+</script>
+
+</body>
 </html>
